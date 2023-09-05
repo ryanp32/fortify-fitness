@@ -1,6 +1,6 @@
+require("dotenv").config();
 const fs = require("fs");
 const { parse } = require("csv-parse");
-const API_KEY = "";
 
 fs.createReadStream("csv_transaction_list_test.csv")
   .pipe(parse({ delimiter: ",", from_line: 2 }))
@@ -18,7 +18,7 @@ fs.createReadStream("csv_transaction_list_test.csv")
 
 function addInvoice() {
   const data = {
-    api_key: API_KEY,
+    api_key: process.env.NOOKAL_API_KEY,
     location_id: 1,
     practitioner_id: 1,
     patient_id: 2,
