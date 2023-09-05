@@ -25,13 +25,13 @@ Before you begin, ensure you have the following prerequisites installed on your 
    git --version
    ```
 
-   Make sure it returns a version number. If not, you can download and install Git from [git-scm.com](https://git-scm.com/). 
+   Make sure it returns a version number. If not, you can download and install Git from [git-scm.com](https://git-scm.com/).
 
 ## Installation
 
 Now that you have the prerequisites installed, let's set up the Node.js project:
 
-1. **Clone the Repository**: Open your terminal and navigate to the directory where you want to install the project. 
+1. **Clone the Repository**: Open your terminal and navigate to the directory where you want to install the project.
 
    ```shell
    cd path/to/folder
@@ -61,7 +61,13 @@ Now that you have the prerequisites installed, let's set up the Node.js project:
 
 ### API Key
 
-Add your API key into the `.env` file to allow the script to communicate to Nookal.
+Firstly create a `.env` file by copying the `.env.example` file
+
+```shell
+cp .env.example .env
+```
+
+Now open the file and enter your Nookal API key. This will allow the script to communicate to Nookal.
 
 ### CSV File
 
