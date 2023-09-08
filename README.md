@@ -1,6 +1,6 @@
 # Introduction
 
-The project allows you to batch process EziDebit receipts and create Invoices in Nookal.
+The project allows you to batch process Ezidebit receipts and create Invoices in Nookal.
 
 # Project Installation Guide
 
@@ -71,7 +71,7 @@ Now open the file and enter your Nookal API key. This will allow the script to c
 
 ### CSV File
 
-Name your CSV file `csv_transaction_list.csv` and add it to the `fortify-fitness` directory.
+Export a CSV file from Ezidebit and put it in the `fortify-fitness` directory. Make sure to export the file with column headers.
 
 ## Running the Project
 
@@ -81,10 +81,10 @@ After completing the installation and configuration, you can run the script:
 node scripts/processCsv.js
 ```
 
-This command will read the CSV, then loop over each row and create invoices in Nookal.
+This command will prompt you to enter the name of the CSV, let you preview what invoices will be created, then create the invoices in Nookal.
 
 ## Conclusion
 
-You've successfully installed and set up the EziDebit to Nookal script on your Mac computer. If you encounter any issues or have questions, refer to the project's documentation or seek assistance from the project's maintainers.
+You've successfully installed and set up the Ezidebit to Nookal script on your Mac computer. If you encounter any issues or have questions, refer to the project's documentation or seek assistance from the project's maintainers.
 
 Happy processing!
