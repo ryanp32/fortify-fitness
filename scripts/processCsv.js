@@ -7,98 +7,92 @@ const chalk = require("chalk");
 const SECONDS_DELAY = 1;
 const rows = [];
 
-askForFileName();
+// Run the program
+main();
 
-async function askForFileName() {
-  const questions = [
-    {
-      type: "input",
-      name: "filename",
-      message: "Enter a filename:",
-      validate: function (input) {
-        // Validate the input to ensure it's not empty
-        if (!input) {
-          return "Please enter a filename.";
-        }
-        return true;
-      },
-    },
-  ];
+async function main() {
+  // Ask for filename
+  const filename = await askForFileName();
 
-  const answers = await inquirer.prompt(questions);
+  if (!filename) {
+    console.log("No filename provided. Exiting.");
+    return;
+  }
 
-  const filename = answers.filename;
-  console.log(`You entered the filename: ${filename}`);
+  const fileStream = createFileStream(filename);
 
-  // Now you can use the "filename" variable in your code
-  fs.createReadStream(filename) //"csv_transaction_list_testh2.csv")
-    .pipe(
-      parse({
-        delimiter: ",",
-        from_line: 1,
-        columns: true,
-        // group_columns_by_name: true,
+  // Read CSV data and perform dry run
+  const parsedData = await parseCsvFile(fileStream);
+  if (parsedData.length === 0) {
+    console.log("No data to process. Exiting.");
+    return;
+  }
+
+  // Confirm continue and process invoices
+  const shouldContinue = await confirmContinuation();
+  if (!shouldContinue) {
+    console.log("Cancelled, no invoices created.");
+    return;
+  }
+
+  await processInvoices(parsedData);
+}
+
+async function parseCsvFile(fileStream) {
+  const parsedData = [];
+
+  return new Promise((resolve, reject) => {
+    fileStream
+      .pipe(
+        parse({
+          delimiter: ",",
+          from_line: 1,
+          columns: true,
+        })
+      )
+      .on("data", function (row) {
+        console.log(chalk.bgGreenBright.bold(row["Payer First Name"]));
+        rows.push(row);
+        addInvoice({ row, dryRun: true });
+        parsedData.push(row);
       })
-    )
-    .on("data", function (row) {
-      console.log(chalk.bgGreenBright.bold(row["Payer First Name"]));
+      .on("end", function () {
+        console.log(
+          chalk.bold(`\nFound ${rows.length} records ready to process\n`)
+        );
+        resolve(parsedData);
+      })
+      .on("error", function (error) {
+        console.error(error.message);
+        reject(error);
+      });
+  });
+}
 
-      rows.push(row);
+async function processInvoices(data) {
+  const promises = data.map(async (row, index) => {
+    await sleep(SECONDS_DELAY * 1000 * index);
 
-      addInvoice({ row });
-    })
-    .on("end", async function () {
-      console.log(
-        chalk.bold(`\nFound ${rows.length} records ready to process\n`)
-      );
+    try {
+      const invoiceData = await addInvoice({
+        row,
+        dryRun: false,
+      });
 
-      const response = await inquirer.prompt([
-        {
-          type: "confirm",
-          name: "confirm",
-          message: "Do you want to continue?",
-          default: true, // Optional, sets the default to Yes
-        },
-      ]);
+      return invoiceData;
+    } catch (error) {
+      console.error("Error:", error);
+      return null;
+    }
+  });
 
-      // Handle the user's response
-      if (response.confirm) {
-        console.log("");
-
-        const promises = rows.map(async (row, index) => {
-          await new Promise((resolve) =>
-            setTimeout(resolve, SECONDS_DELAY * 1000 * index)
-          );
-
-          try {
-            const data = await addInvoice({
-              row,
-              dryRun: false,
-            });
-
-            return data;
-          } catch (error) {
-            console.error("Error:", error);
-            return null; // or handle the error as needed
-          }
-        });
-
-        Promise.all(promises)
-          .then((results) => {
-            // All promises have resolved, and results contains the resolved values
-            console.log("\nFinished creating invoices!");
-            console.table(results, ["name", "status", "invoiceNumber"]);
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
-      } else {
-        console.log("Cancelled, no invoices created.");
-      }
-    })
-    .on("error", function (error) {
-      console.log(error.message);
-    });
+  try {
+    const results = await Promise.all(promises);
+    console.log("\nFinished creating invoices!");
+    console.table(results);
+  } catch (error) {
+    console.error("Error:", error);
+  }
 }
 
 async function addInvoice({ row, dryRun = true }) {
@@ -151,6 +145,57 @@ async function addInvoice({ row, dryRun = true }) {
       throw error;
     }
   }
+}
+
+async function askForFileName() {
+  const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "filename",
+      message: "Enter a filename:",
+      validate: function (input) {
+        if (!input) {
+          return "Please enter a filename.";
+        }
+        return true;
+      },
+    },
+  ]);
+
+  const filename = answers.filename;
+  //  console.log(`You entered the filename: ${filename}`);
+  return filename;
+}
+
+function createFileStream(filename) {
+  const fileStream = fs.createReadStream(filename);
+
+  fileStream.on("error", (err) => {
+    if (err.code === "ENOENT") {
+      console.error("File not found:", filename);
+    } else {
+      console.error("Error:", err.message);
+    }
+  });
+
+  return fileStream;
+}
+
+async function confirmContinuation() {
+  const response = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "confirm",
+      message: "Do you want to continue?",
+      default: true,
+    },
+  ]);
+
+  return response.confirm;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function encodeParams(data) {
