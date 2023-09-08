@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^4.1.2",
     "csv": "^6.3.1",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "inquirer": "^8.2.6"
   }
 }
