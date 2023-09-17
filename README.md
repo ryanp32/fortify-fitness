@@ -75,13 +75,20 @@ Export a CSV file from Ezidebit and put it in the `fortify-fitness` directory. M
 
 ## Running the Project
 
-After completing the installation and configuration, you can run the script:
+After completing the installation and configuration, you can run the script one of two ways.
+
+#### Option 1: Double-click `run.sh`.
+
+Ensure that you have configured `Terminal` as the default program to run .sh files
+
+#### Option 2: Run via command line
 
 ```shell
+cd path/to/folder
 node scripts/processCsv.js
 ```
 
-This command will prompt you to enter the name of the CSV, let you preview what invoices will be created, then create the invoices in Nookal.
+After executing the script, it will prompt you to enter the name of the CSV, let you preview what invoices will be created, then create the invoices in Nookal.
 
 ## Conclusion
 
