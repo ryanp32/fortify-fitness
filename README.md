@@ -59,7 +59,7 @@ Now that you have the prerequisites installed, let's set up the Node.js project:
 
 ## Updating
 
-If you need to update the script to the latest version, run the `update.commend` script.
+If you need to update the script to the latest version, run the `update.command` script.
 
 ## Configuration
 
@@ -75,17 +75,19 @@ Now open the file and enter your Nookal API key. This will allow the script to c
 
 ## Running the Script
 
-### 1.Export CSV File from Ezidebit
+### Step 1: Export CSV File from Ezidebit
 
 Export a CSV file from Ezidebit and put it in the `fortify-fitness` directory. Make sure to export the file with column headers.
 
-### 2.Export CSV File from Ezidebit
+### Step 2: Run the `run` command
 
-#### Option 1: Double-click `run.command`.
+There are two ways to run the script.
+
+#### Double-click `run.command`.
 
 This should launch a terminal window. If not, check that you have configured `Terminal` as the default program to run .command files.
 
-#### Option 2: Run via command line
+#### Run via command line
 
 ```shell
 cd path/to/folder
