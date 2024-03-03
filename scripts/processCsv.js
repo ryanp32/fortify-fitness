@@ -19,10 +19,12 @@ async function main() {
     return;
   }
 
+  const paymentMethod = await askForPaymentMethod();
+
   const fileStream = createFileStream(filename);
 
   // Read CSV data and perform dry run
-  const parsedData = await parseCsvFile(fileStream);
+  const parsedData = await parseCsvFile(fileStream, paymentMethod);
   if (parsedData.length === 0) {
     console.log("No data to process. Exiting.");
     return;
@@ -35,10 +37,10 @@ async function main() {
     return;
   }
 
-  await processInvoices(parsedData);
+  await processInvoices(parsedData, paymentMethod);
 }
 
-async function parseCsvFile(fileStream) {
+async function parseCsvFile(fileStream, paymentMethod) {
   const parsedData = [];
 
   return new Promise((resolve, reject) => {
@@ -53,7 +55,7 @@ async function parseCsvFile(fileStream) {
       .on("data", function (row) {
         console.log(chalk.bgGreenBright.bold(row["Payer First Name"]));
         rows.push(row);
-        addInvoice({ row, dryRun: true });
+        addInvoice({ row, paymentMethod, dryRun: true });
         parsedData.push(row);
       })
       .on("end", function () {
@@ -95,7 +97,7 @@ async function processInvoices(data) {
   }
 }
 
-async function addInvoice({ row, dryRun = true }) {
+async function addInvoice({ row, paymentMethod, dryRun = true }) {
   const [patientId, passId, practitionerId] =
     row["Client Contract Ref"].split(":");
 
@@ -106,7 +108,7 @@ async function addInvoice({ row, dryRun = true }) {
     patient_id: patientId,
     "items[0][item_id]": passId,
     "items[0][type]": "Pass",
-    "payments[0][method]": "Cheque",
+    "payments[0][method]": paymentMethod,
     "payments[0][amount]": row["Payment Amount"],
   };
 
@@ -154,9 +156,31 @@ async function askForFileName() {
       type: "input",
       name: "filename",
       message: "Enter a filename:",
+      default: "csv_transaction_list.csv",
       validate: function (input) {
         if (!input) {
           return "Please enter a filename.";
+        }
+        return true;
+      },
+    },
+  ]);
+
+  const filename = answers.filename;
+  //  console.log(`You entered the filename: ${filename}`);
+  return filename;
+}
+
+async function askForPaymentMethod() {
+  const answers = await inquirer.prompt([
+    {
+      type: "input",
+      name: "filename",
+      message: "Enter Payment Method (e.g. Cheque, Credit Card):",
+      default: "Cheque",
+      validate: function (input) {
+        if (!input) {
+          return "Please enter a payment method.";
         }
         return true;
       },
