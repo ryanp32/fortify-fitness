@@ -96,12 +96,13 @@ async function processInvoices(data) {
 }
 
 async function addInvoice({ row, dryRun = true }) {
-  const [patientId, passId] = row["Client Contract Ref"].split(":");
+  const [patientId, passId, practitionerId] =
+    row["Client Contract Ref"].split(":");
 
   const data = {
     api_key: process.env.NOOKAL_API_KEY,
     location_id: 1,
-    practitioner_id: 1,
+    practitioner_id: practitionerId || 1,
     patient_id: patientId,
     "items[0][item_id]": passId,
     "items[0][type]": "Pass",
