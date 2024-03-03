@@ -106,7 +106,7 @@ async function addInvoice({ row, dryRun = true }) {
     patient_id: patientId,
     "items[0][item_id]": passId,
     "items[0][type]": "Pass",
-    "payments[0][method]": "Credit Card",
+    "payments[0][method]": "Cheque",
     "payments[0][amount]": row["Payment Amount"],
   };
 
